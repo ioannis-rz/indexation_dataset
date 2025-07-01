@@ -1,7 +1,7 @@
 #include "common.h"
 
 void display_menu() {
-    printf("\nSistema de Búsqueda - Combinar 2 Parámetros\n");
+    printf("\nSistema de Busqueda\n");
     printf("1. Seleccionar primer criterio\n");
     printf("2. Seleccionar segundo criterio\n");
     printf("3. Realizar búsqueda\n");
@@ -31,6 +31,7 @@ void display_record(Record *rec) {
     printf("\nQuote Amount: %llu", rec->quote_coin_amount);
     printf("\nVirtual token balance: %llu", rec->virtual_token_balance_after);
     printf("\nVirtual sol balance: %llu", rec->virtual_sol_balance_after);
+    printf("\nSignature: %s", rec->signature);
     printf("\nProvided gas fee: %llu", rec->provided_gas_fee);
     printf("\nProvided gas limit: %llu", rec->provided_gas_limit);
     printf("\nFee: %llu", rec->fee);
@@ -38,7 +39,7 @@ void display_record(Record *rec) {
     printf("\n----------------------------------------\n");
 }
 
-int get_criteria_value(SearchType type, void *value) {
+int get_criteria_value(SearchType type, void *value, int dato) {
     switch (type) {
         case SEARCH_BY_SLOT:
             printf("Ingrese slot: ");
@@ -49,7 +50,7 @@ int get_criteria_value(SearchType type, void *value) {
             return scanf("%u", (unsigned int*)value) == 1;
             
         case SEARCH_BY_DIRECTION:
-            printf("Ingrese dirección (buy/sell): ");
+            printf("Ingrese direccion (buy/sell): ");
             return scanf("%4s", (char*)value) == 1;
             
         case SEARCH_BY_WALLET:
@@ -57,9 +58,9 @@ int get_criteria_value(SearchType type, void *value) {
             return scanf("%49s", (char*)value) == 1;
             
         case SEARCH_BY_ROW:
-            printf("Ingrese número de fila: ");
+            printf("Ingrese numero de fila (1 - %u): ", dato);
             return scanf("%u", (unsigned int*)value) == 1;
-            
+                        
         default:
             return 0;
     }
@@ -107,8 +108,8 @@ int main() {
                 scanf("%d", (int*)&req.type1);
                 getchar();
                 
-                if (!get_criteria_value(req.type1, &req.param1)) {
-                    printf("Error: Valor inválido\n");
+                if (!get_criteria_value(req.type1, &req.param1, meta.record_count)) {
+                    printf("Error: Valor invalido\n");
                     req.type1 = 0;
                 }
                 break;
@@ -118,8 +119,8 @@ int main() {
                 scanf("%d", (int*)&req.type2);
                 getchar();
                 
-                if (!get_criteria_value(req.type2, &req.param2)) {
-                    printf("Error: Valor inválido\n");
+                if (!get_criteria_value(req.type2, &req.param2, meta.record_count)) {
+                    printf("Error: Valor invalido\n");
                     req.type2 = 0;
                 }
                 break;
@@ -142,7 +143,7 @@ int main() {
                 // Recibir respuesta
                 int response_fd = open(response_pipe, O_RDONLY);
                 if (response_fd < 0) {
-                    perror("Error abriendo tubería de respuesta");
+                    perror("Error abriendo tuberia de respuesta");
                     break;
                 }
 
@@ -174,7 +175,7 @@ int main() {
                 break;
                 
             default:
-                printf("Opción inválida\n");
+                printf("Opción invalida\n");
         }
     } while (option != 4);
 

@@ -20,6 +20,7 @@
 #define MAX_MEMORY 10 * 1024 * 1024
 #define REQUEST_PIPE "/tmp/search_request"
 #define RESPONSE_PIPE_TEMPLATE "/tmp/search_response_%d"
+#define HASH_SIZE 1000003  // Tamaño primo para la tabla hash
 
 // Tipos de búsqueda
 typedef enum {
@@ -83,5 +84,19 @@ typedef struct {
         char wallet[50];
     } param2;
 } SearchRequest;
+
+// Añadir al final de common.h
+typedef struct HashEntry {
+    uint64_t key;           // slot << 32 | tx_idx
+    long offset;            // Offset en data.bin
+    struct HashEntry* next; // Puntero para encadenamiento
+} HashEntry;
+
+typedef struct {
+    HashEntry** buckets;    // Array de buckets
+    size_t size;            // Tamaño de la tabla
+} HashTable;
+
+unsigned int hash_function(uint64_t key);
 
 #endif // COMMON_H
